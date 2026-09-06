@@ -1,6 +1,7 @@
 CREATE TABLE users (
                        id          BIGSERIAL PRIMARY KEY,
-                       username    VARCHAR(100) NOT NULL UNIQUE,
+                       username    VARCHAR(100) NOT NULl,
+                       email       VARCHAR(255) NOT NULL UNIQUE,
                        password    VARCHAR(255) NOT NULL,
                        role        VARCHAR(50)  NOT NULL,
                        created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
@@ -50,9 +51,9 @@ CREATE INDEX idx_vehicles_year ON vehicles(year);
 CREATE INDEX idx_maintenance_scheduled_date ON maintenance_logs(scheduled_date);
 CREATE INDEX idx_maintenance_is_completed ON maintenance_logs(is_completed);
 
--- Default users. Password for both accounts: secret
-INSERT INTO users (username, password, role)
-VALUES ('Samir', '$2a$10$cYLM.qoXpeAzcZhJ3oXRLu9Slkb61LHyWW5qJ4QKvHEMhaxZ5qCPi', 'ADMIN');
+-- Default users (Parol artiq 123456 olacaq)
+INSERT INTO users (username, email, password, role)
+VALUES ('admin', 'admin@fleettrack.com', '$2a$10$cYLM.qoXpeAzcZhJ3oXRLu9Slkb61LHyWW5qJ4QKvHEMhaxZ5qCPi', 'ADMIN');
 
-INSERT INTO users (username, password, role)
-VALUES ('Miri', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'FLEET_MANAGER');
+INSERT INTO users (username, email, password, role)
+VALUES ('fleetmanager', 'manager@fleettrack.com', '$2a$10$cYLM.qoXpeAzcZhJ3oXRLu9Slkb61LHyWW5qJ4QKvHEMhaxZ5qCPi', 'FLEET_MANAGER');

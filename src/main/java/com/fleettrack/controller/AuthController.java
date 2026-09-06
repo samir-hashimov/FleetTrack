@@ -54,7 +54,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Authentication successful",
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))),
             @ApiResponse(responseCode = "400", description = "Validation error (e.g., empty fields)", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Invalid username or password", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid email or password", content = @Content),
             @ApiResponse(responseCode = "429", description = "Rate limit exceeded", content = @Content)
     })
     @SecurityRequirements

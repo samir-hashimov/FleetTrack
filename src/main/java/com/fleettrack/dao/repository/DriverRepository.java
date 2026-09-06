@@ -23,7 +23,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, JpaSpecif
 
     Optional<Driver> findByAssignedVehicleId(Long vehicleId);
 
-    Optional<Driver> findByUserUsername(String username);
+    Optional<Driver> findByUserEmail(String email);
 
     void deleteByStatusAndUpdatedAtBefore(DriverStatus status, Instant thresholdDate);
+
+    boolean existsByAssignedVehicleId(Long vehicleId);
 }

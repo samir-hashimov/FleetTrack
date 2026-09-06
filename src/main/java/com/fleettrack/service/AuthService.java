@@ -33,16 +33,17 @@ public class AuthService {
 
     @Transactional
     public String register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException("Username already exists: " + request.getUsername());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email already exists: " + request.getEmail());
         }
 
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.DRIVER);
 
-         userRepository.save(user);
+        userRepository.save(user);
         return "User registered successfully! Please log in.";
     }
 
@@ -51,12 +52,12 @@ public class AuthService {
         if (request.getRole() == Role.DRIVER) {
             throw new BusinessException("Drivers must register via the public /auth/register API.");
         }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException("Username already exists: " + request.getUsername());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email already exists: " + request.getEmail());
         }
-
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
@@ -66,10 +67,10 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException("User not found"));
 
         return generateAuthTokens(user);
@@ -83,8 +84,9 @@ public class AuthService {
             throw new BusinessException("Refresh token is invalid or expired");
         }
 
-        String username = jwtService.extractUsername(refreshToken);
-        User user = userRepository.findByUsername(username)
+        String email = jwtService.extractUsername(refreshToken);
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException("User not found"));
 
         return generateAuthTokens(user);
@@ -92,7 +94,7 @@ public class AuthService {
 
     private AuthResponse generateAuthTokens(User user) {
         UserDetails principal = org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
+                .withUsername(user.getEmail())
                 .password(user.getPassword())
                 .authorities("ROLE_" + user.getRole().name())
                 .build();

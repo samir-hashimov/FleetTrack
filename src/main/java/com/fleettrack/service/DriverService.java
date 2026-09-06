@@ -59,10 +59,9 @@ public class DriverService {
             throw new BusinessException("This user account is already linked to another driver profile.");
         }
 
-        String requestedFullName = request.getFirstName().trim() + " " + request.getLastName().trim();
-
-        if (!user.getUsername().equalsIgnoreCase(requestedFullName)) {
-            throw new BusinessException("The provided name (" + requestedFullName + ") does not match the account username (" + user.getUsername() + ").");
+        String requestedEmail = request.getContactData().getEmail().trim();
+        if (!user.getEmail().equalsIgnoreCase(requestedEmail)) {
+            throw new BusinessException("The provided email (" + requestedEmail + ") does not match the account email (" + user.getEmail() + ").");
         }
 
         Driver driver = driverMapper.toEntity(request);
@@ -125,13 +124,15 @@ public class DriverService {
 
     private void verifyDriverAccess(Long targetDriverId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+
+        String email = auth.getName();
+
         boolean isAdminOrManager = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_FLEET_MANAGER"));
 
         if (!isAdminOrManager) {
-            Driver myDriver = driverRepository.findByUserUsername(username)
-                    .orElseThrow(() -> new EntityNotFoundException("Driver profile not found for user: " + username));
+            Driver myDriver = driverRepository.findByUserEmail(email)
+                    .orElseThrow(() -> new EntityNotFoundException("Driver profile not found for email: " + email));
 
             if (!myDriver.getId().equals(targetDriverId)) {
                 throw new UnauthorizedActionException("You are only allowed to access or update your own profile.");

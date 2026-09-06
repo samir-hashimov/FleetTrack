@@ -1,8 +1,10 @@
 package com.fleettrack.service;
 
+import com.fleettrack.dao.repository.DriverRepository;
 import com.fleettrack.dto.request.VehicleLocationRequest;
 import com.fleettrack.dto.response.VehicleLocationResponse;
 import com.fleettrack.dao.entity.Vehicle;
+import com.fleettrack.exception.BusinessException;
 import com.fleettrack.util.VehicleStatus;
 import com.fleettrack.redis.FleetAlertPublisher;
 import com.fleettrack.dao.repository.VehicleRepository;
@@ -25,10 +27,14 @@ public class VehicleLocationService {
     private final VehicleService vehicleService;
     private final VehicleLocationBroadcaster locationBroadcaster;
     private final FleetAlertPublisher fleetAlertPublisher;
+    private final DriverRepository driverRepository ;
 
     public VehicleLocationResponse updateLocation(VehicleLocationRequest request) {
         Vehicle vehicle = vehicleService.findVehicleOrThrow(request.getVehicleId());
-
+        boolean hasDriver = driverRepository.existsByAssignedVehicleId(request.getVehicleId());
+        if (!hasDriver) {
+            throw new BusinessException("Cannot update location. This vehicle does not have an assigned driver.");
+        }
         verifyVehicleAccess(vehicle);
 
         vehicle.setLatitude(request.getLatitude());

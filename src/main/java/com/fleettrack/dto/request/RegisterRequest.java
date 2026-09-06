@@ -1,6 +1,7 @@
 package com.fleettrack.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -13,6 +14,10 @@ public class RegisterRequest {
     @NotBlank(message = "Username cannot be blank")
     @Size(min = 4, max = 50, message = "Username must be between 4 and 50 characters")
     private String username;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
 
     @Schema(description = "Password for the new account", example = "SecurePass123!")
     @NotBlank(message = "Password cannot be blank")
